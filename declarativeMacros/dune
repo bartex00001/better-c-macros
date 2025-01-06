@@ -1,0 +1,6 @@
+(library
+ (name DeclarativeMacros))
+
+(menhir (modules declParser))
+
+(ocamllex declLexer)
