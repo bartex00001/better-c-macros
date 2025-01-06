@@ -1,0 +1,6 @@
+(library
+ (name CLang))
+
+(menhir (modules cparser))
+
+(ocamllex clexer)
