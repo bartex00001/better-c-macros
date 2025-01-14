@@ -3,77 +3,61 @@ open DeclAst
 %}
 
 %token <int> INT
+%token <float> FLOAT
 %token <string> IDENT
-%token TIMES
-%token DIV
-%token PLUS
-%token MINUS
-%token LPAREN
-%token RPAREN
-%token AND
-%token OR
-%token EQ
-%token LT
-%token GT
-%token LEQ
-%token GEQ
-%token NEQ
-%token TRUE
-%token FALSE
-%token IF
-%token THEN
-%token ELSE
-%token LET
-%token IN
-%token FUN
+
+%token L_CURL
+%token R_CURL
+%token L_PAREN
+%token R_PAREN
+%token L_BRACK
+%token R_BRACK
+
+%token DOLLAR
+%token HASH
+%token PERCENT
+%token COMMA
+%token STAR
 %token ARROW
+%token COLON
+
 %token EOF
 
-%start <DeclAst.expr> prog
-
-%nonassoc AND OR
-%nonassoc EQ NEQ LT GT LEQ GEQ
-%left PLUS MINUS
-%left TIMES DIV
+%start <DeclAst.macro> start
 
 %%
 
-prog:
-  | e = mixfix; EOF { e }
+start:
+  | HASH; HASH; name = IDENT; L_CURL; r = rules; R_CURL { { name; matches = r } }
   ;
 
-mixfix:
-  | IF; e1 = expr; THEN; e2 = mixfix; ELSE; e3 = mixfix { If(e1, e2, e3) }
-  | LET; x = IDENT; EQ; e1 = mixfix; IN; e2 = mixfix { Let(x, e1, e2) }
-  | FUN; x = IDENT; ARROW; e = mixfix { Fun(x, e) }
-  | e = expr { e }
+rules:
+  | rule { [$1] }
+  | rules; rule { $2 :: $1 }
   ;
 
-expr:
-  | e1 = expr; PLUS; e2 = expr { Binop(Add, e1, e2) }
-  | e1 = expr; MINUS; e2 = expr { Binop(Sub, e1, e2) }
-  | e1 = expr; DIV; e2 = expr { Binop(Div, e1, e2) }
-  | e1 = expr; TIMES; e2 = expr { Binop(Mult, e1, e2) }
-  | e1 = expr; EQ; e2 = expr { Binop(Eq, e1, e2) }
-  | e1 = expr; LT; e2 = expr { Binop(Lt, e1, e2) }
-  | e1 = expr; GT; e2 = expr { Binop(Gt, e1, e2) }
-  | e1 = expr; LEQ; e2 = expr { Binop(Leq, e1, e2) }
-  | e1 = expr; GEQ; e2 = expr { Binop(Geq, e1, e2) }
-  | e1 = expr; NEQ; e2 = expr { Binop(Neq, e1, e2) }
-  | e1 = expr; AND; e2 = expr { Binop(And, e1, e2) }
-  | e1 = expr; OR; e2 = expr { Binop(Or, e1, e2) }
-  | e = app { e }
+rule:
+  | L_PAREN; m = matcher_root; R_PAREN; ARROW; L_CURL; r = result_root; R_CURL { m, r }
   ;
 
-app:
-  | e1 = app; e2 = base { App(e1, e2) }
-  | e = base { e }
+matcher_root:
+  | matcher { SequenceMatch [$1] }
+  | matcher_root; matcher { SequenceMatch ($2 :: $1) }
   ;
 
-base:
-  | i = INT { Int i }
-  | x = IDENT { Var x }
-  | LPAREN; e = mixfix; RPAREN { e }
-  | TRUE { Bool true }
-  | FALSE { Bool false }
+matcher:
+  | IDENT { DirectMatch $1 }
+  | DOLLAR; name = IDENT; COLON; tp = IDENT { NamedMatch(name, match_type_of_string tp) }
+  | DOLLAR; L_BRACK; m = matcher_root; R_BRACK { m }
+  ;
+
+result_root:
+  | result { [$1] }
+  | result_root; result { $2 :: $1 }
+  ;
+
+result:
+  | IDENT { DirectRes $1 }
+  | DOLLAR; name = IDENT { NamedRes(name, Ident) }
+  | HASH; name = IDENT; L_BRACK; args = result_root; R_BRACK { MacroRes(name, args) }
   ;
