@@ -1,0 +1,8 @@
+(library
+ (name CLang)
+ (libraries DeclarativeMacros))
+
+
+(menhir (modules declParser))
+
+(ocamllex declLexer)

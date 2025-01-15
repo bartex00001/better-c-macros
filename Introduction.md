@@ -414,7 +414,7 @@ Atrybuty będą możliwe do odczytania w:
 --
 
 ```txt
-#derive(debugPrint)
+#[debugPrint()]
 typedef struct {
 	int normal;
 
