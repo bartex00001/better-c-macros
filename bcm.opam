@@ -11,6 +11,7 @@ bug-reports: "https://github.com/bartex00001/better-c-macros/issues"
 depends: [
   "ocaml"
   "dune" {>= "3.15"}
+  "test_bcm"
   "odoc" {with-doc}
 ]
 build: [
