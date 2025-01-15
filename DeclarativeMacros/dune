@@ -1,0 +1,4 @@
+(library
+ (name DeclarativeMacros)
+ (libraries CProcessing))
+ 

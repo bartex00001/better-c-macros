@@ -19,6 +19,6 @@
  (name bcm)
  (synopsis "Better macros for C")
  (description "A longer description")
- (depends ocaml dune))
+ (depends ocaml dune test_bcm))
 
-(using menhir 2.1)
+(using menhir 3.0)
