@@ -1,0 +1,10 @@
+(library
+ (name CProcessing))
+
+
+(menhir
+ (modules cParser)
+ (flags --automaton-graph)
+ (explain true))
+
+(ocamllex cLexer)
