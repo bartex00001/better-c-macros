@@ -33,7 +33,7 @@ start:
 
 rules:
   | rule { [$1] }
-  | rules; rule { $2 :: $1 }
+  | rules; rule { $1 @ [$2] }
   ;
 
 rule:
@@ -41,14 +41,14 @@ rule:
   ;
 
 matcher_root:
-  | matcher { SequenceMatch [$1] }
-  | matcher_root; matcher { SequenceMatch ($2 :: $1) }
+  | matcher { [$1] }
+  | matcher_root; matcher { $2 :: $1 }
   ;
 
 matcher:
   | IDENT { DirectMatch $1 }
   | DOLLAR; name = IDENT; COLON; tp = IDENT { NamedMatch(name, match_type_of_string tp) }
-  | DOLLAR; L_BRACK; m = matcher_root; R_BRACK { m }
+  | DOLLAR; L_BRACK; m = matcher_root; R_BRACK { SequenceMatch m }
   ;
 
 result_root:
@@ -58,6 +58,6 @@ result_root:
 
 result:
   | IDENT { DirectRes $1 }
-  | DOLLAR; name = IDENT { NamedRes(name, Ident) }
+  | DOLLAR; name = IDENT { NamedRes(name) }
   | HASH; name = IDENT; L_BRACK; args = result_root; R_BRACK { MacroRes(name, args) }
   ;

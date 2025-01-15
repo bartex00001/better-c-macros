@@ -24,5 +24,5 @@ type result =
 
 type macro =
   { name: ident
-  ; matches: (matcher * result list ) list
+  ; matches: (matcher list * result list) list
   }
