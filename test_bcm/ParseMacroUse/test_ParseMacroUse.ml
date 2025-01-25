@@ -17,21 +17,26 @@ let c_elem = testable pp_c_elem comp_c_elem
 
 let root_dir = "../../../../test_bcm/ParseMacroUse/"
 let minimal_file = (root_dir ^ "minimal_general.c", [
-  MacroUse("myMacro", [ Ident("abc") ]);
-  MacroUse("comples_name1", [ Ident("arr"); Direct("["); Int(0); Direct("]"); ]);
+  MacroUse("myMacro", [ Tok(Ident("abc")); ]);
+  MacroUse("comples_name1", [
+    Tok(Ident("arr"));
+    Tok(Direct("["));
+    Tok(Int(0));
+    Tok(Direct("]"));
+  ]);
 ])
 
 
 let parentheses_file = (root_dir ^ "parentheses.c", [
   MacroUse("math_macro", [
-    Direct("("); Int(2); Direct("+"); Int(2); Direct(")"); Direct("/"); Int(3);
+    Tok(Direct("(")); Tok(Int(2)); Tok(Direct("+")); Tok(Int(2)); Tok(Direct(")")); Tok(Direct("/")); Tok(Int(3));
   ]);
   MacroUse("very_nested", [
-    Direct("("); Direct("("); Direct("("); Direct(")"); Direct(")"); Direct(")");
-    Direct("("); Direct("("); Direct("("); Direct(")"); Direct(")"); Direct(")")
+    Tok(Direct("(")); Tok(Direct("(")); Tok(Direct("(")); Tok(Direct(")")); Tok(Direct(")")); Tok(Direct(")"));
+    Tok(Direct("(")); Tok(Direct("(")); Tok(Direct("(")); Tok(Direct(")")); Tok(Direct(")")); Tok(Direct(")"));
   ]);
-  MacroUse("strings_skipped", [ String(") well, maybe now! \\\") :(") ]);
-  MacroUse("multiline", [ Int(1); Int(2); Int(3) ]);
+  MacroUse("strings_skipped", [ Tok(String(") well, maybe now! \\\") :(")); ]);
+  MacroUse("multiline", [ Tok(Int(1)); Tok(Int(2)); Tok(Int(3)); ]);
 ])
 
 let large_file = (root_dir ^ "large.c", [
@@ -43,9 +48,9 @@ let large_file = (root_dir ^ "large.c", [
   CCode("int main ( ) {");
   ProcUse("huh");
   CCode("foo (");
-  MacroUse("mySqrt", [ Int(4); Direct("+"); Ident("num") ]);
+  MacroUse("mySqrt", [ Tok(Int(4)); Tok(Direct("+")); Tok(Ident("num")); ]);
   CCode(") ; char * str =");
-  MacroUse("concat", [ String("Hello"); Direct(","); String("World") ]);
+  MacroUse("concat", [ Tok(String("Hello")); Tok(Direct(",")); Tok(String("World")); ]);
   CCode("; }");
 ])
 

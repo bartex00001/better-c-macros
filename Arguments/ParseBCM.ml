@@ -10,6 +10,7 @@ type configuration =
 
 (* TODO: do not use mutable state for argument parsing.
  *       unfortunatley this would require writing my own argument parser...
+ *       ...but one might use a state monad for this purpose.
  *)
 
 let usage_msg = "Usage: bcm [options] <file1> [<file2>] ..."

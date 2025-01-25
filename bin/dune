@@ -1,4 +1,4 @@
 (executable
  (public_name bcm)
  (name main)
- (libraries DeclarativeMacros CProcessing Arguments))
+ (libraries BCMMacros CProcessing Arguments))
