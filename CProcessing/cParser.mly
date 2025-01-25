@@ -40,21 +40,25 @@ let match_type_of_string = function
 %token MACRO_DEF
 
 %token EQ
-%token PLUS_EQ
-%token MINUS_EQ
-%token STAR_EQ
-%token SLASH_EQ
-%token PERCENT_EQ
-%token AMP_EQ
-%token PIPE_EQ
-%token XOR_EQ
+%token PLUS_ASSIGN
+%token MINUS_ASSIGN
+%token STAR_ASSIGN
+%token SLASH_ASSIGN
+%token PERCENT_ASSIGN
+%token AMP_ASSIGN
+%token PIPE_ASSIGN
+%token XOR_ASSIGN
 %token NOT_EQ
 %token NOT
 
 %token ASSIGN
 
+%token SH_LEFT_ASSIGN
+%token SH_LEFT
 %token LE
 %token LESS
+%token SH_RIGHT_ASSIGN
+%token SH_RIGHT
 %token GE
 %token GREATER
 
@@ -144,7 +148,7 @@ macro_matcher_element:
     { NamedMatch (name, match_type_of_string type_name) }
   | LBRACE { DirectMatch( Direct "{") }
   | RBRACE { DirectMatch( Direct "}") }
-  | use_macro_typed_token { DirectMatch $1 }
+  | macro_typed_token { DirectMatch $1 }
   ;
 
 
@@ -183,7 +187,7 @@ macro_result_sequence:
 
 macro_result_element:
   | DOLLAR; name = IDENTIFIER { NamedRes name }
-  | use_macro_typed_token { DirectRes $1 }
+  | macro_typed_token { DirectRes $1 }
   ;
 
 
@@ -199,11 +203,13 @@ use_macro_tokens:
 
 use_macro_token_segment:
   | LPAREN; inner = use_macro_tokens; RPAREN
-    { Direct("(") :: inner @ [Direct(")")] }
-  | use_macro_typed_token { [$1] }
+    { Tok(Direct("(")) :: inner @ [Tok(Direct(")"))] }
+  | macro_typed_token { [Tok $1] }
   ;
 
-use_macro_typed_token:
+
+
+macro_typed_token:
   | IDENTIFIER { Ident $1 }
   | INT { Int $1 }
   | FLOAT { Float $1 }
@@ -232,19 +238,23 @@ code_element:
 
 token_as_string:
   | EQ { "==" }
-  | PLUS_EQ { "+=" }
-  | MINUS_EQ { "-=" }
-  | STAR_EQ { "*=" }
-  | SLASH_EQ { "/=" }
-  | PERCENT_EQ { "%=" }
-  | AMP_EQ { "&=" }
-  | PIPE_EQ { "|=" }
-  | XOR_EQ { "^=" }
+  | PLUS_ASSIGN { "+=" }
+  | MINUS_ASSIGN { "-=" }
+  | STAR_ASSIGN { "*=" }
+  | SLASH_ASSIGN { "/=" }
+  | PERCENT_ASSIGN { "%=" }
+  | AMP_ASSIGN { "&=" }
+  | PIPE_ASSIGN { "|=" }
+  | XOR_ASSIGN { "^=" }
   | NOT_EQ { "!=" }
   | NOT { "!" }
   | ASSIGN { "=" }
+  | SH_LEFT_ASSIGN { "<<=" }
+  | SH_LEFT { "<<" }
   | LE { "<=" }
   | LESS { "<" }
+  | SH_RIGHT_ASSIGN { ">>=" }
+  | SH_RIGHT { ">>" }
   | GE { ">=" }
   | GREATER { ">" }
   | PLUSPLUS { "++" }

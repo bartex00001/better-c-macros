@@ -56,21 +56,25 @@ read = parse
   | integer { INT (int_of_string (Lexing.lexeme lexbuf)) }
 
   | "==" { EQ }
-  | "+=" { PLUS_EQ }
-  | "-=" { MINUS_EQ }
-  | "*=" { STAR_EQ }
-  | "/=" { SLASH_EQ }
-  | "%=" { PERCENT_EQ }
-  | "&=" { AMP_EQ }
-  | "|=" { PIPE_EQ }
-  | "^=" { XOR_EQ }
+  | "+=" { PLUS_ASSIGN }
+  | "-=" { MINUS_ASSIGN }
+  | "*=" { STAR_ASSIGN }
+  | "/=" { SLASH_ASSIGN }
+  | "%=" { PERCENT_ASSIGN }
+  | "&=" { AMP_ASSIGN }
+  | "|=" { PIPE_ASSIGN }
+  | "^=" { XOR_ASSIGN }
   | "!=" { NOT_EQ }
   | "!" { NOT }
 
   | "=" { ASSIGN }
-
+ 
+  | "<<=" { SH_LEFT_ASSIGN }
+  | "<<" { SH_LEFT }
   | "<=" { LE }
   | "<" { LESS }
+  | ">>=" { SH_RIGHT_ASSIGN}
+  | ">>" { SH_RIGHT }
   | ">=" { GE }
   | ">" { GREATER }
 

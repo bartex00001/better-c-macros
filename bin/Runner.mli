@@ -1,5 +1,5 @@
 open Arguments
 
 
-(** The actuall work will start here. *)
+(** Process all files from configuration and print them. *)
 val run : ParseBCM.configuration -> unit
