@@ -1,4 +1,4 @@
 (library
- (name DeclarativeMacros)
+ (name BCMMacros)
  (libraries CProcessing))
- 
+

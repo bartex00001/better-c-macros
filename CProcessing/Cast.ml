@@ -20,17 +20,19 @@ type macro_token =
   | Float of float
   | String of string
   | Char of char
-  (* | L_Paren
-  | R_Paren
-  | L_Brace
-  | R_Brace
-  | L_Bracket
-  | R_Bracket
-  | Semicolon
-  | Comma *)
+  | EndToken
 
   
 type macro_tokens = macro_token list
+
+
+(** Represents usage of macro 'ident' with 'macro-tokens' that need
+  * to be checked for other macru uses first. **)
+type macro_use = ident * macro_token_results
+and macro_token_result =
+  | Tok of macro_token
+  | Use of macro_use
+and macro_token_results = macro_token_result list
 
 
 type macro_matcher_element =
@@ -64,17 +66,17 @@ type macro_def =
   }
 
 
-
 type c_elem =
   | CPreprocesor of string
   | CCode of string
   | ProcUse of string
   | MacroDef of macro_def
-  | MacroUse of ident * macro_tokens
+  | MacroUse of macro_use
   (* | Derive of (ident * macro_tokens) list * cstruct *)
 
 
 type cfile = c_elem list
+
 
 
 (* 
@@ -90,13 +92,4 @@ type ctype =
 
 type cstruct = ident * (ctype * ident) list
 
-
-type c_code = string *)
-
-(* TODO: Define in Declarative Macro subproject *)
-(* type macro_def = unit
-type tokens = unit
-  
-
-
-type cfile = cfile_element list *)
+*)
