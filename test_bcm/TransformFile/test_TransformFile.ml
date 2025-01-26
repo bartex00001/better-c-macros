@@ -76,7 +76,7 @@ let check_bitwise_example = (root_dir ^ "bitwise.c",
 let counter_example = (root_dir ^ "counter.c", " + 1-1 + 1-1 + 0\n")
 
 
-let check_file_transformation test_name (tokens, expected) () = check string test_name expected (Transform.transform_file MacroEnv.empty tokens)
+let check_file_transformation test_name (tokens, expected) () = check string test_name expected (Transform.transform_file [] MacroEnv.empty tokens)
 
 let parse_and_check_transformation test_name (file_name, expected) =
   let tokens = parse_file_c file_name in

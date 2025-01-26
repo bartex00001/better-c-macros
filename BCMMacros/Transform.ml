@@ -30,24 +30,26 @@ let macro_transform env macro =
 in run_macro_transformer macro
 
 
-let[@tail_mod_cons] rec transform_file env = function
-  | Cast.CPreprocesor proc :: rest ->
-    (proc ^ "\n") ^ transform_file env rest
+let transform_file include_paths env cfile = 
+  let[@tail_mod_cons] rec aux_transform_file env = function
+    | Cast.CPreprocesor proc :: rest ->
+      (proc ^ "\n") ^ aux_transform_file env rest
 
-  | Cast.CCode code :: rest ->
-    code ^ transform_file env rest
+    | Cast.CCode code :: rest ->
+      code ^ aux_transform_file env rest
 
-  | Cast.ProcUse file_name :: rest ->
-    let env = MacroEnv.add_entries_from_file env file_name
-    in transform_file env rest
+    | Cast.ProcUse file_name :: rest ->
+      let env = MacroEnv.add_entries_from_file include_paths env file_name
+      in aux_transform_file env rest
 
-  | MacroDef def :: rest ->
-    let env = MacroEnv.add_decl_macro env def.name def
-    in transform_file env rest
+    | MacroDef def :: rest ->
+      let env = MacroEnv.add_decl_macro env def.name def
+      in aux_transform_file env rest
 
-  | MacroUse use :: rest ->
-    let tokens = macro_transform env use
-      |> Print.string_of_macro_tokens
-    in tokens ^ transform_file env rest
+    | MacroUse use :: rest ->
+      let tokens = macro_transform env use
+        |> Print.string_of_macro_tokens
+      in tokens ^ aux_transform_file env rest
 
-  | [] -> "\n"
+    | [] -> "\n"
+  in aux_transform_file env cfile

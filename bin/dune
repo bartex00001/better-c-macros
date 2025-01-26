@@ -1,4 +1,15 @@
 (executable
  (public_name bcm)
- (name main)
- (libraries BCMMacros CProcessing Arguments))
+ (name bcm)
+ (modules bcm)
+ (libraries ArgumentsParser RunUtilities))
+
+(executable
+ (public_name bcmc)
+ (name bcmc)
+ (modules bcmc)
+ (libraries ArgumentsParser RunUtilities unix))
+
+(env
+  (dev
+    (flags (:standard -w -32))))

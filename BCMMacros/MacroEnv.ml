@@ -1,5 +1,9 @@
 open Interpret
 
+
+type include_path = string
+
+
 module StringMap = Map.Make(String)
 
 
@@ -23,7 +27,7 @@ let add_decl_macro env name macro =
   }
 
 
-let add_entries_from_file env _ =
+let add_entries_from_file _ env _ =
   (* TODO: implement symbol extraction from ocaml dynamic libraries *)
   env
 

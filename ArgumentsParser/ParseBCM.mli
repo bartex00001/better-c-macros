@@ -1,9 +1,13 @@
 
+type output_method =
+  | Stdout
+  | File of string
+
 type configuration =
-  { verbose: bool
-  ; working_dir: string
+  { working_dir: string
   ; include_paths: string list
-  ; files: string list
+  ; file_name: string
+  ; output_method: output_method 
   }
 
 
