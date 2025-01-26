@@ -16,6 +16,12 @@ let c_elem = testable pp_c_elem comp_c_elem
 
 
 let root_dir = "../../../../test_bcm/ParseCommentsAndCMacros/"
+
+let parse_hello_world = (root_dir ^ "main.c", [
+  CPreprocesor("#include <stdio.h>");
+  CCode("int main ( ) { printf ( \"\\tHello World!\\n\" ) ; }");
+])
+
 let small_file = (root_dir ^ "small.c", [
   CPreprocesor("#include <stdio.h>");
   CPreprocesor("#include <stdlib.h>");
@@ -47,6 +53,8 @@ let check_file_parsing test_name (file_name, expected) () = check (list c_elem) 
 
 let () =
   run "C preprocesor and comments removal" [
+    "Hello World",
+      [ test_case "check if equal" `Quick (check_file_parsing "Hello World" parse_hello_world); ];
     "Smallest Example",
       [ test_case "check if equal" `Quick (check_file_parsing "Smallest Example" small_file); ];
     "Multiline Macro",

@@ -130,6 +130,8 @@ read_till_end_of_line = parse
 and
 read_till_end_of_quotes = parse
   | "\"" { "" }
+  | "\\n" { "\\n" ^ read_till_end_of_quotes lexbuf }
+  | "\\t" { "\\t" ^ read_till_end_of_quotes lexbuf }
   | "\\\"" { "\\\"" ^ read_till_end_of_quotes lexbuf }
   | not_escaped_quote {
       let curr = Lexing.lexeme lexbuf
