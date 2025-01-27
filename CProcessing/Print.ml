@@ -86,7 +86,7 @@ and print_fields = function
 
 let string_of_struct cstruct =
   let name = cstruct.name
-  in let fields = cstruct.fields
+  in let fields = cstruct.fields |> List.map (fun {name; ctype; _} -> (ctype, name))
   in let (td_pref, td_suf) = match cstruct.typedef with
     | Some id -> "typedef ", " " ^ id
     | None -> "", ""

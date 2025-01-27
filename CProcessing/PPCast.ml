@@ -87,10 +87,15 @@ let pp_basic_type fmt = function
 let rec pp_cstruct fmt {name; fields; typedef} =
   Format.fprintf fmt "{%a; %a; %a}"
   Format.pp_print_string name
-  (Format.pp_print_list (fun fmt (ctype, name) ->
-    Format.fprintf fmt "{%a, %a}"
+  (Format.pp_print_list (fun fmt {name; ctype; attributes} ->
+    Format.fprintf fmt "{%a, %a, %a}"
     pp_ctype ctype
     Format.pp_print_string name
+    (Format.pp_print_list (fun fmt (id, tokens) ->
+      Format.fprintf fmt "(%a, %a)"
+      Format.pp_print_string id
+      (Format.pp_print_option pp_macro_token) tokens
+    )) attributes
   )) fields
   (Format.pp_print_option Format.pp_print_string) typedef
 and pp_ctype fmt = function
