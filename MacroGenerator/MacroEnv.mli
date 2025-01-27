@@ -1,3 +1,4 @@
+open BCMMacros
 open CProcessing.Cast
 
 
@@ -26,7 +27,7 @@ val add_entries_from_file
 (** Get declarative macro from the environment.
   * Empty when no macro transformer with given name exists. **)
 val get_decl_macro
-  : macro_env -> string -> Interpret.token_transformer option
+  : macro_env -> string -> token_transformer option
   
 (** Get derive macro from the environment.
   * Empty when no macro transformer with given name exists. **)

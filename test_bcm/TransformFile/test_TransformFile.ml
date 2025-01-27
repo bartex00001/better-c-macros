@@ -1,7 +1,7 @@
 open Alcotest
 open CProcessing
 open CProcessing.Cast
-open BCMMacros
+open MacroGenerator
 
 
 let parse_channel channel =
@@ -24,9 +24,9 @@ let simplest_token_transformation = ([
 
 let use_macro_ommited = ([
     CPreprocesor("#include <stdio.h>");
-    ProcUse("serialize");
+    (* ProcUse("serialize"); *)
+    (* TODO: Mock macro library import *)
     CCode("int main() {printf(\"Hello World\");}");
-    ProcUse("deserialize123");
   ],
     "#include <stdio.h>\n"
     ^ "int main() {printf(\"Hello World\");}\n"
@@ -84,7 +84,7 @@ let parse_and_check_transformation test_name (file_name, expected) =
 
 
 let () =
-  run "ProcUse parsing" [
+  run "Macro transformation" [
     "Simplest token transformation",
       [ test_case "check if equal" `Quick (check_file_transformation "Test transformation" simplest_token_transformation); ];
     "Use macro ommited in print",

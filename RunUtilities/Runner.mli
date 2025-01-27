@@ -1,7 +1,7 @@
 
 type file_name = string
 
-(* TODO: Mark in docs what exceptions do these functions raise. *)
+(* TODO: Mark what exceptions can arise from these functions. *)
 
 (** Process the file and return the transformed contents.
   * [process_file include_paths file] will process the file [file]
