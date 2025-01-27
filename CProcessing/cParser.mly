@@ -98,6 +98,7 @@ let get_type_of_list = function
 %token NOT
 
 %token ASSIGN
+%token ARROW
 
 %token SH_LEFT_ASSIGN
 %token SH_LEFT
@@ -343,6 +344,10 @@ code_element:
 
 
 token_as_string:
+  | STRUCT { "struct" }
+  | UNION { "union" }
+  | ENUM { "enum" }
+  | TYPEDEF { "typedef" }
   | EQ { "==" }
   | PLUS_ASSIGN { "+=" }
   | MINUS_ASSIGN { "-=" }
@@ -355,6 +360,7 @@ token_as_string:
   | NOT_EQ { "!=" }
   | NOT { "!" }
   | ASSIGN { "=" }
+  | ARROW { "->" }
   | SH_LEFT_ASSIGN { "<<=" }
   | SH_LEFT { "<<" }
   | LE { "<=" }
