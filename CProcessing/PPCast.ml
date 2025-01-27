@@ -22,9 +22,13 @@ let pp_macro_token fmt = function
   | EndToken -> ()
 
 
-let pp_macro_result_element fmt = function
+let rec pp_macro_result_element fmt = function
   | DirectRes token -> Format.fprintf fmt "DirectRes(%a)" pp_macro_token token
   | NamedRes id -> Format.fprintf fmt "NamedRes(%a)" Format.pp_print_string id
+  | MacroResUse (id, tokens) ->
+      Format.fprintf fmt "MacroResUse(%a, %a)"
+      Format.pp_print_string id
+      (Format.pp_print_list pp_macro_result_element) tokens
 
 
 let rec pp_macro_result fmt = function

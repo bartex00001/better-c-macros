@@ -7,7 +7,7 @@ let minimal_struct = (
     ; fields = []
     ; typedef = None
     },
-    "struct test {  }"
+    "struct test {  };\n"
   )
 
 let basic_fields = (
@@ -25,7 +25,7 @@ let basic_fields = (
     ]
     ; typedef = None
     },
-    "struct basic { int a; unsigned long long u_l_l; uint64_t u64;  }"
+    "struct basic { int a; unsigned long long u_l_l; uint64_t u64;  };\n"
 )
 
 let pointers = (
@@ -43,7 +43,7 @@ let pointers = (
     ]
     ; typedef = None
     },
-    "struct pointers { int* a; unsigned long long** u_l_l; uint64_t* u64;  }"
+    "struct pointers { int* a; unsigned long long** u_l_l; uint64_t* u64;  };\n"
 )
 
 let arrays = (
@@ -60,7 +60,7 @@ let arrays = (
       ; attributes = []}]
     ; typedef = None
     },
-    "struct arrays { int a[5]; unsigned long long* u_l_l[5][5]; uint64_t u64[5];  }"
+    "struct arrays { int a[5]; unsigned long long* u_l_l[5][5]; uint64_t u64[5];  };\n"
 )
 
 
@@ -76,7 +76,7 @@ let functions = (
     ]
     ; typedef = None
     },
-    "struct functions { int (*a)(int, int); uint64_t* (*u64)();  }"
+    "struct functions { int (*a)(int, int); uint64_t* (*u64)();  };\n"
 )
 
 let cstruct = (
@@ -91,7 +91,7 @@ let cstruct = (
     ]
     ; typedef = Some "s_t"
     },
-    "typedef struct s { struct a {  } s; struct { int num; bool b;  } s2;  } s_t"
+    "typedef struct s { struct a {  } s; struct { int num; bool b;  } s2;  } s_t;\n"
 )
 
 let union = (
@@ -106,7 +106,7 @@ let union = (
     ]
     ; typedef = Some "u_t"
     },
-    "typedef struct u { union a {  } u; union { int num; bool b;  } u2;  } u_t"
+    "typedef struct u { union a {  } u; union { int num; bool b;  } u2;  } u_t;\n"
 )
 
 let enum = (
@@ -121,7 +121,7 @@ let enum = (
     ]
     ; typedef = Some "e_t"
     },
-    "typedef struct e { enum a { A, B, C } e; enum { A, B, C } e2;  } e_t"
+    "typedef struct e { enum a { A, B, C } e; enum { A, B, C } e2;  } e_t;\n"
 )
 
 
