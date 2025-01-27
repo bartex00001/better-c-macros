@@ -1,8 +1,5 @@
+open BCMMacros
 open CProcessing.Cast
-
-
-type token_transformer = macro_tokens -> macro_token_results
-
 
 (** Used to implement Mealy's automaton *)
 module StateMachine = Map.Make(Int)

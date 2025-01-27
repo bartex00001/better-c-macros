@@ -1,0 +1,3 @@
+(library
+ (name MacroGenerator)
+ (libraries CProcessing BCMMacros dynlink))
