@@ -22,7 +22,6 @@ let empty_struct = (root_dir ^ "empty_struct.c", [
     fields = [];
     typedef = None;
   });
-  CCode ";"
 ])
 
 let multiple_derives = (root_dir ^ "multiple_derives.c", [
@@ -31,7 +30,6 @@ let multiple_derives = (root_dir ^ "multiple_derives.c", [
     fields = [];
     typedef = None;
   });
-  CCode ";"
 ])
 
 let basic_fields = (root_dir ^ "basic_fields.c", [
@@ -56,7 +54,6 @@ let basic_fields = (root_dir ^ "basic_fields.c", [
     ];
     typedef = Some "test_1ng";
   });
-  CCode ";"
 ])
 
 let awful_field_types = (root_dir ^ "awful_field_types.c", [
@@ -78,7 +75,6 @@ let awful_field_types = (root_dir ^ "awful_field_types.c", [
     ];
     typedef = None;
   });
-  CCode ";"
 ])
 
 let parse_pointers = (root_dir ^ "pointers.c", [
@@ -97,7 +93,6 @@ let parse_pointers = (root_dir ^ "pointers.c", [
     ];
     typedef = None;
   });
-  CCode ";"
 ])
 
 let parse_multi_pointer = (root_dir ^ "multi_pointer.c", [
@@ -113,7 +108,6 @@ let parse_multi_pointer = (root_dir ^ "multi_pointer.c", [
     ];
     typedef = None;
   });
-  CCode ";"
 ])
 
 let parse_array = (root_dir ^ "array.c", [
@@ -132,7 +126,6 @@ let parse_array = (root_dir ^ "array.c", [
     ];
     typedef = Some "ABC";
   });
-  CCode ";"
 ])
 
 let parse_functions = (root_dir ^ "functions.c", [
@@ -148,7 +141,6 @@ let parse_functions = (root_dir ^ "functions.c", [
     ];
     typedef = Some "ABC";
   });
-  CCode ";"
 ])
 
 let parse_attributes = (root_dir ^ "attributes.c", [
@@ -169,7 +161,6 @@ let parse_attributes = (root_dir ^ "attributes.c", [
     ];
     typedef = None;
   });
-  CCode ";"
 ])
 
 let check_file_parsing test_name (file_name, expected) () = check (list c_elem) test_name expected (parse_file_c file_name)

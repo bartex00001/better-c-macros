@@ -91,5 +91,5 @@ let string_of_struct cstruct =
     | Some id -> "typedef ", " " ^ id
     | None -> "", ""
   in
-  td_pref ^ "struct " ^ name ^ " { " ^ print_fields fields ^ " }" ^ td_suf
+  td_pref ^ "struct " ^ name ^ " { " ^ print_fields fields ^ " }" ^ td_suf ^ ";\n"
   (* Semicolon not needed as it is parsed as c token *)

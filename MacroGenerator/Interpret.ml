@@ -257,55 +257,59 @@ let rec find_first f = function
     end
 
 
+
+let rec expand env = function
+| [] -> []
+| DirectRes t :: mre_l -> Tok t :: expand env mre_l
+| NamedRes name :: mre_l ->
+  let token = begin match StrMap.find_opt name env with
+    | Some (List (l :: _)) -> l
+    (* TODO: Make this into an exception... *)
+    | Some (List []) -> failwith "Empty list cannot be expanded!"
+    | Some (Single t) -> t
+    | None -> failwith "No such variable in environment!"
+  end in 
+    Tok token :: expand env mre_l
+| MacroResUse (name, mre_list) :: mre_l ->
+  Use (name, expand env mre_list) :: expand env mre_l
+
+
 (** Expands sequence of macro_result_element *)
 let expandSequence env mre_list =
 
-  let update_var_count new_count = function
-    | None -> Some new_count
-    | Some count when new_count < count -> Some new_count
-    | Some count -> Some count
-  in
-
   let expansion_count =
-    List.fold_left (fun count -> function
-      | DirectRes _ -> count
-      | NamedRes name -> begin match StrMap.find_opt name env, count with
-          | Some (List l), None -> Some (List.length l)
-          | Some (List l), Some count -> Some (min count (List.length l))
-          | Some (Single _), _ -> failwith "Single value cannot be expanded!"
-          | None, count -> count 
-        end
-    ) None mre_list
+    let rec count_expr count = function
+    | DirectRes _ -> count
+    | NamedRes name -> begin match StrMap.find_opt name env, count with
+        | Some (List l), None -> Some (List.length l)
+        | Some (List l), Some count -> Some (min count (List.length l))
+        | Some (Single _), _ -> failwith "Single value cannot be expanded!"
+        | None, count -> count 
+      end
+    | MacroResUse (_, mre_list) -> List.fold_left count_expr count mre_list
+    in
+    List.fold_left count_expr None mre_list
   in
 
-  let rec expand env var_count = function
-    | [] -> begin match var_count with
-        | None   -> failwith "cannot expand sequence without list variables!"
-        | Some 0 -> []
-        | Some _ -> expand env None mre_list
-      end 
-    | DirectRes t :: mre_l -> Tok t :: expand env var_count mre_l
-    (* TODO: CLEAN THIS UP ** SO MESSY ** *)
-    | NamedRes name :: mre_l ->
-      let list = begin match StrMap.find_opt name env with
-        | Some (List l) -> l
-        | Some (Single _) -> failwith "Single value cannot be expanded!"
-        | None -> failwith "No such variable in environment!"
-      end
-      in begin match list with
-        | [] -> failwith "Empty list cannot be expanded!"
-        | t :: tl ->
-          let new_env = StrMap.add name (List tl) env
-          in let var_count = update_var_count (List.length tl) var_count
-          in
-          Tok t :: expand new_env var_count mre_l
-      end
+  let shorten_env =
+    StrMap.map begin function
+      | Single t -> Single t
+      | List (_ :: tl) -> List tl
+      | List [] -> List [] (* Allow as it may be unused here *)
+    end
   in
 
   match expansion_count with
     | None -> []
     | Some 0 -> []
-    | Some _ -> expand env None mre_list
+    | Some count ->
+      let rec expand_n env = function
+        | 0 -> []
+        | n ->
+            let new_env = shorten_env env in
+            expand env mre_list @ expand_n new_env (n - 1)
+      in
+      expand_n env count
 
 
 let[@tail_mod_cons] rec print_result_tokens env = function
@@ -317,6 +321,9 @@ let[@tail_mod_cons] rec print_result_tokens env = function
       | Some (List _) -> failwith "List cannot be printed without expansion!"
       | None -> failwith "No such variable in environment!"
     end
+  | BasicRes (MacroResUse (name, mre_list)) :: tl -> 
+    Use (name, expand env mre_list)
+    :: (print_result_tokens[@tailcall]) env tl
   | SequenceRes mre_list :: tl ->
     expandSequence env mre_list @ print_result_tokens env tl
   | MacroRes (name, mre_list) :: tl -> 

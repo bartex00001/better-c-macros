@@ -13,6 +13,7 @@ type macro_matcher =
 type macro_result_element =
   | DirectRes of macro_token
   | NamedRes of ident
+  | MacroResUse of ident * macro_result_element list
 
 type macro_result =
   | BasicRes of macro_result_element
