@@ -10,7 +10,7 @@ module StringMap = Map.Make(String)
 
 type macro_env =
   { decl_macros: token_transformer StringMap.t
-  ; derive_macros: unit StringMap.t
+  ; derive_macros: derive_generator StringMap.t
   }
 
 let empty =
@@ -44,15 +44,18 @@ let add_entries_from_file include_paths env lib_name =
       let _ = Dynlink.loadfile lib_path
       in
       let decl_macros = get_decl_macros ()
-      in let decl_macro_env =
+      and derive_macros = get_derive_macros ()
+      in
+      let decl_macro_env =
         List.fold_left (fun env (name, macro) -> StringMap.add name macro env)
         env.decl_macros decl_macros
+      and derive_macros_env =
+        List.fold_left (fun env (name, generator) -> StringMap.add name generator env)
+        env.derive_macros derive_macros
       in
-      { env with decl_macros = decl_macro_env }
-
-
-let add_derive_macro env name () =
-  { env with derive_macros = StringMap.add name () env.derive_macros }
+      { decl_macros = decl_macro_env
+      ; derive_macros = derive_macros_env
+      }
 
 
 let get_decl_macro env name =
@@ -60,4 +63,5 @@ let get_decl_macro env name =
 
 
 let get_derive_macro env name =
+  StringMap.iter (fun key _ -> print_endline key) env.derive_macros;
   StringMap.find_opt name env.derive_macros

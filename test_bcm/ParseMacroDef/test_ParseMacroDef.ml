@@ -248,7 +248,7 @@ let check_file_parsing test_name (file_name, expected) () = check (list c_elem) 
 
 
 let () =
-  run "MacroUse parsing" [
+  run "MacroDef parsing" [
     "Empty macro definition parsing",
       [ test_case "check if equal" `Quick (check_file_parsing "Empty macro definition" empty_macro_def); ];
     "Minimal macro definition parsing (one token)",

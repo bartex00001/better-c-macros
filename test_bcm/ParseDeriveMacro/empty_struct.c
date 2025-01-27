@@ -1,0 +1,3 @@
+#derive(debug)
+struct Test {
+};

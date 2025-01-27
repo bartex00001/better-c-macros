@@ -25,8 +25,8 @@ type macro_token =
 type macro_tokens = macro_token list
 
 
-(** Represents usage of macro 'ident' with 'macro-tokens' that need
-  * to be checked for other macru uses first. **)
+(** Represents usage of macro [ident] with [macro-tokens] that need
+    to be checked for other macru uses first. *)
 type macro_use = ident * macro_token_results
 and macro_token_result =
   | Tok of macro_token

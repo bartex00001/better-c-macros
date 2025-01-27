@@ -1,7 +1,7 @@
 (lang dune 3.15)
 
 (name bcm)
-(version 0.0.1)
+(version 0.0.2)
 
 (generate_opam_files true)
 
