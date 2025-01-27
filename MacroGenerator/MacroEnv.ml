@@ -63,5 +63,4 @@ let get_decl_macro env name =
 
 
 let get_derive_macro env name =
-  StringMap.iter (fun key _ -> print_endline key) env.derive_macros;
   StringMap.find_opt name env.derive_macros

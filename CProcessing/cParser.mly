@@ -154,7 +154,7 @@ start:
   | use_macro { $1 }
   | PREPROCESOR { CPreprocesor $1 }
   | code_element { $1 }
-  | DERIVE; LPAREN; macros = read_derive_args; RPAREN; cstruct = parse_cstruct
+  | DERIVE; LPAREN; macros = read_derive_args; RPAREN; cstruct = parse_cstruct; SEMICOLON
     { Derive (macros, cstruct)}
   (* TODO: Remove once made sure all c tokens are parsed correctly.
    * This is a workaround to include all tokens without explicitly
@@ -207,7 +207,7 @@ macro_matcher_element:
 macro_result:
   | macro_result_element { [ BasicRes $1 ] }
 
-  | DOLLAR; LPAREN; inside = macro_result_sequence* RPAREN; start
+  | DOLLAR; LPAREN; inside = macro_result_sequence* RPAREN; STAR
     { [ SequenceRes (List.flatten inside) ] }
 
   | LBRACE; elements = macro_result*; RBRACE
@@ -225,15 +225,17 @@ macro_result:
   ;
 
 macro_result_sequence:
-  | LPAREN; elements = macro_result_element*; RPAREN
-    {  DirectRes( Direct "(" )
-      :: elements
-      @ [ DirectRes( Direct ")" ) ] }
+  | macro_result_element { [$1] }
   | LBRACE; elements = macro_result_element*; RBRACE
     {  DirectRes( Direct "{" )
       :: elements
       @ [ DirectRes( Direct "}" ) ] }
-  | macro_result_element { [$1] }
+  | LPAREN; elements = macro_result_element*; RPAREN
+    {  DirectRes( Direct "(" )
+      :: elements
+      @ [ DirectRes( Direct ")" ) ] }
+  | HASH; name = IDENTIFIER; LPAREN; tokens = macro_result_sequence*; RPAREN
+    { [ MacroResUse(name, List.flatten tokens) ] }
   ;
 
 macro_result_element:

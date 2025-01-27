@@ -160,5 +160,4 @@ read_c_string = parse
 and
 read_c_char = parse
   | "\\''" { '\'' }
-  (* TODO: fix so that not all chars are parsed as 'a' *)
-  | _ "'" { 'a' }
+  | _ "'" { String.get (Lexing.lexeme lexbuf) 0 }
