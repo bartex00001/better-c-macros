@@ -22,6 +22,45 @@ let match_type_of_string = function
   | "tt" -> TToken
   | _ -> failwith "Invalid match type"
 
+
+let get_type_and_name_of_list = function
+  | "unsigned" :: "long"   :: "long" :: [name] -> Basic CULLong, name
+  | "unsigned" :: "long"   :: [name] -> Basic CULong, name
+  | "unsigned" :: "int"    :: [name] -> Basic CUInt, name
+  | "unsigned" :: "short"  :: [name] -> Basic CUShort, name
+  | "long"     :: "long"   :: [name] -> Basic CLLong, name
+  | "long"     :: "double" :: [name] -> Basic CLongDouble, name
+  | "unsigned" :: "char"   :: [name] -> Basic CUChar, name
+  | "int"    :: [name] -> Basic CInt, name
+  | "long"   :: [name] -> Basic CLong, name
+  | "short"  :: [name] -> Basic CShort, name
+  | "float"  :: [name] -> Basic CFloat, name
+  | "double" :: [name] -> Basic CDouble, name
+  | "char"   :: [name] -> Basic CChar, name
+  | "bool"   :: [name] -> Basic CBool, name
+  | "void"   :: [name] -> Basic CVoid, name
+  | s :: [name] -> Tdef s, name
+  | _ -> failwith "Invalid type and name list"
+
+let get_type_of_list = function
+  | "unsigned" :: "long"   :: ["long"] -> Basic CULLong
+  | "unsigned" :: ["long"]   -> Basic CULong
+  | "unsigned" :: ["int"]    -> Basic CUInt
+  | "unsigned" :: ["short"]  -> Basic CUShort
+  | "long"     :: ["long"]   -> Basic CLLong
+  | "long"     :: ["double"] -> Basic CLongDouble
+  | "unsigned" :: ["char"]   -> Basic CUChar
+  | ["int"]     -> Basic CInt
+  | ["long"]    -> Basic CLong
+  | ["short"]   -> Basic CShort
+  | ["float"]   -> Basic CFloat
+  | ["double"]  -> Basic CDouble
+  | ["char"]    -> Basic CChar
+  | ["bool"]    -> Basic CBool
+  | ["void"]    -> Basic CVoid
+  | [s] -> Tdef s
+  | _ -> failwith "Invalid type and name list"
+
 %}
 
 
@@ -39,6 +78,12 @@ let match_type_of_string = function
 
 %token BCM_USE
 %token MACRO_DEF
+%token DERIVE
+
+%token STRUCT
+%token UNION
+%token ENUM
+%token TYPEDEF
 
 %token EQ
 %token PLUS_ASSIGN
@@ -109,12 +154,18 @@ start:
   | use_macro { $1 }
   | PREPROCESOR { CPreprocesor $1 }
   | code_element { $1 }
+  | DERIVE; LPAREN; macros = read_derive_args; RPAREN; cstruct = parse_cstruct
+    { Derive (macros, cstruct)}
   (* TODO: Remove once made sure all c tokens are parsed correctly.
    * This is a workaround to include all tokens without explicitly
    * parsing them. *)
   | CODE { CCode $1 }
   ;
 
+
+read_derive_args:
+  | IDENTIFIER { [$1] }
+  | IDENTIFIER; COMMA; rest = read_derive_args { $1 :: rest }
 
 
 bcm_use:
@@ -123,7 +174,7 @@ bcm_use:
   ;
 
 
-
+// ------------------------ Macro Definitions
 def_macro:
   | MACRO_DEF; name = IDENTIFIER; LBRACE; matches = def_macro_match*; RBRACE
     { MacroDef({ name; matches }) }
@@ -151,7 +202,6 @@ macro_matcher_element:
   | RBRACE { DirectMatch( Direct "}") }
   | macro_typed_token { DirectMatch $1 }
   ;
-
 
 
 macro_result:
@@ -192,7 +242,6 @@ macro_result_element:
   ;
 
 
-
 use_macro:
   | HASH; name = IDENTIFIER; LPAREN; tokens = use_macro_tokens; RPAREN
     { MacroUse (name, tokens) }
@@ -209,7 +258,65 @@ use_macro_token_segment:
   ;
 
 
+// ------------------------ CStruct parsing
+parse_cstruct:
+  | TYPEDEF; STRUCT; name = IDENTIFIER; LBRACE; fields = parse_cstruct_fields*; RBRACE; tdef = IDENTIFIER
+    { {name; fields; typedef = Some tdef} }
+  | STRUCT; name = IDENTIFIER; LBRACE; fields = parse_cstruct_fields*; RBRACE
+    { {name; fields; typedef = None} }
+  ;
 
+parse_cstruct_fields:
+  | parse_simple_value; SEMICOLON { $1 }
+  | parse_pointer_value; SEMICOLON { $1 }
+  | parse_array_value; SEMICOLON { $1 }
+  | parse_function_value; SEMICOLON { $1 }
+  ;
+
+parse_simple_value:
+  | ctype = IDENTIFIER* { get_type_and_name_of_list ctype }
+  ;
+
+parse_pointer_value:
+  | pointer_type = pointer_star_catcher; name = IDENTIFIER
+    { pointer_type, name }
+  ;
+
+pointer_star_catcher:
+  | ctype = IDENTIFIER*; STAR { Pointer (get_type_of_list ctype) }
+  | pointer_star_catcher; STAR { Pointer $1 }
+  ;
+
+parse_array_value:
+  | ctype = IDENTIFIER*; array = array_catcher
+    { let (ctype, name) = get_type_and_name_of_list ctype in
+      Array (ctype, array), name }
+  | pointer_star_catcher; name = IDENTIFIER; array = array_catcher
+    { Array ($1, array), name }
+  ;
+
+array_catcher:
+  | LBRACKET; size = INT; RBRACKET { [size] }
+  | LBRACKET; size = INT; RBRACKET; rest = array_catcher;  { size :: rest }
+  ;
+
+parse_function_value:
+  | pointer = pointer_star_catcher; LPAREN; name = IDENTIFIER; STAR; RPAREN; LPAREN; args = parse_function_args; RPAREN
+    { Function (pointer, args), name }
+  | ctype = IDENTIFIER*; LPAREN; name = IDENTIFIER; STAR; RPAREN; LPAREN; args = parse_function_args; RPAREN
+    { let ctype = get_type_of_list ctype in
+      Function (ctype, args), name }
+  ;
+
+parse_function_args:
+  | ctype = IDENTIFIER*; { [get_type_of_list ctype] }
+  | pointer_star_catcher; { [$1] }
+  | ctype = IDENTIFIER*; COMMA; rest = parse_function_args; { get_type_of_list ctype :: rest }
+  | pointer_star_catcher; COMMA; rest = parse_function_args; { $1 :: rest }
+  ;
+
+
+// ------------------------ TOKENS
 macro_typed_token:
   | IDENTIFIER { Ident $1 }
   | INT { Int $1 }
@@ -218,7 +325,6 @@ macro_typed_token:
   | CCHAR { Char $1 }
   | token_as_string { Direct $1 }
   ;
-
 
 
 (* We are not interested in the structure of c code *)
@@ -234,7 +340,6 @@ code_element:
   | RBRACE { CCode "}" }
   | token_as_string { CCode $1 }
   ;
-
 
 
 token_as_string:

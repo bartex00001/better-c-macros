@@ -32,28 +32,18 @@ type macro_def =
   }
 
 
+(** [CPreprocesor code] some preprocesor directive – do not touch
+  * [CCode code] include raw C code [code]
+  * [ProcUse name] include compiled macro library [name]
+  * [MacroDef] Defines new declarative macro
+  * [MacroUse] Usage of a declarative macro
+  * [Derive macros, cstruct] What derive macros are applied to given struct *)
 type c_elem =
   | CPreprocesor of string
   | CCode of string
   | ProcUse of string
   | MacroDef of macro_def
   | MacroUse of macro_use
-  (* | Derive of (ident * macro_tokens) list * cstruct *)
+  | Derive of ident list * cstruct
 
 type cfile = c_elem list
-
-
-(* 
-
-type ctype =
-  | Tdef of string
-  | Pointer of ctype
-  | Array of ctype * int
-  | Function of ctype * ctype list
-  | Struct of ident option * (ctype * ident) list
-  | Union of ident option * (ctype * ident) list
-  | Enum of ident option * string list
-
-type cstruct = ident * (ctype * ident) list
-
-*)

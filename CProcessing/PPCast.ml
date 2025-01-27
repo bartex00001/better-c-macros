@@ -65,6 +65,68 @@ and pp_macro_token_result fmt = function
   | Tok token -> Format.fprintf fmt "Tok(%a)" pp_macro_token token
   | Use use -> pp_macro_use fmt use
 
+
+let pp_basic_type fmt = function
+  | CInt -> Format.fprintf fmt "CInt"
+  | CUInt -> Format.fprintf fmt "CUint"
+  | CLong -> Format.fprintf fmt "CLong"
+  | CULong -> Format.fprintf fmt "CULong"
+  | CLLong -> Format.fprintf fmt "CLLong"
+  | CULLong -> Format.fprintf fmt "CULLong"
+  | CShort -> Format.fprintf fmt "CShort"
+  | CUShort -> Format.fprintf fmt "CUShort"
+  | CFloat -> Format.fprintf fmt "CFloat"
+  | CDouble -> Format.fprintf fmt "CDouble"
+  | CLongDouble -> Format.fprintf fmt "CLongDouble"
+  | CChar -> Format.fprintf fmt "CChar"
+  | CUChar -> Format.fprintf fmt "CUChar"
+  | CBool -> Format.fprintf fmt "CBool"
+  | CVoid -> Format.fprintf fmt "CVoid"
+
+
+let rec pp_cstruct fmt {name; fields; typedef} =
+  Format.fprintf fmt "{%a; %a; %a}"
+  Format.pp_print_string name
+  (Format.pp_print_list (fun fmt (ctype, name) ->
+    Format.fprintf fmt "{%a, %a}"
+    pp_ctype ctype
+    Format.pp_print_string name
+  )) fields
+  (Format.pp_print_option Format.pp_print_string) typedef
+and pp_ctype fmt = function
+  | Basic b -> Format.fprintf fmt "Basic(%a)" pp_basic_type b
+  | Tdef s -> Format.fprintf fmt "Tdef(%a)" Format.pp_print_string s
+  | Pointer ctype -> Format.fprintf fmt "Pointer(%a)" pp_ctype ctype
+  | Array (ctype, i) ->
+    Format.fprintf fmt "Array(%a, %a)"
+    pp_ctype ctype
+    (Format.pp_print_list Format.pp_print_int) i
+  | Function (ctype, ctypelist) ->
+    Format.fprintf fmt "Function(%a, %a)"
+    pp_ctype ctype
+    (Format.pp_print_list pp_ctype) ctypelist
+  | Struct (id, fields) ->
+    Format.fprintf fmt "Struct(%a, %a)"
+    (Format.pp_print_option Format.pp_print_string) id
+    (Format.pp_print_list (fun fmt (ctype, id) ->
+      Format.fprintf fmt "{%a, %a}"
+      pp_ctype ctype
+      Format.pp_print_string id
+    )) fields
+  | Union (id, fields) ->
+    Format.fprintf fmt "Union(%a, %a)"
+    (Format.pp_print_option Format.pp_print_string) id
+    (Format.pp_print_list (fun fmt (ctype, id) ->
+      Format.fprintf fmt "{%a, %a}"
+      pp_ctype ctype
+      Format.pp_print_string id
+    )) fields
+  | Enum (id, strings) ->
+    Format.fprintf fmt "Enum(%a, %a)"
+    (Format.pp_print_option Format.pp_print_string) id
+    (Format.pp_print_list Format.pp_print_string) strings
+  
+
 let pp_c_elem fmt = function
   | CPreprocesor s -> Format.fprintf fmt "CPreprocesor(%a)" Format.pp_print_string s
   | CCode s -> Format.fprintf fmt "CCode(%a)" Format.pp_print_string s
@@ -79,6 +141,10 @@ let pp_c_elem fmt = function
   | MacroUse muse ->
     Format.fprintf fmt "MacroUse(%a)"
     pp_macro_use muse
+  | Derive (macros, cstruct) ->
+    Format.fprintf fmt "Derive(%a, %a)"
+    (Format.pp_print_list Format.pp_print_string) macros
+    pp_cstruct cstruct
 
 
 let comp_c_elem = (=)
