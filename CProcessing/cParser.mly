@@ -1,5 +1,6 @@
 %{
 open Cast
+open BCMMacros
 
 (* During lexing not all C symbols will be "close" to each other
  * thus they will be parsed as separate entries.

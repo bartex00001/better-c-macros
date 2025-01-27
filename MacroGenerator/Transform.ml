@@ -1,5 +1,5 @@
 open CProcessing
-
+open BCMMacros
 
 (** Transform macro use into a list of tokens.
 * This function will also handle recursive macro expansion **)
@@ -15,8 +15,8 @@ let macro_transform env macro =
   (* TODO: Add recursion counter to detect infinite expansion loops *)
   and tokens_of_result_tokens result_tokens =
     let tokens_of_result_token = function
-      | Cast.Tok token -> [token]
-      | Cast.Use macro -> run_macro_transformer macro
+      | Tok token -> [token]
+      | Use macro -> run_macro_transformer macro
     in
     List.map tokens_of_result_token result_tokens
     |> List.flatten

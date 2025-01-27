@@ -1,4 +1,3 @@
 (library
  (name BCMMacros)
- (libraries CProcessing))
-
+ (public_name bcm.BCMMacros))

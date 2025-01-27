@@ -1,5 +1,5 @@
 open CProcessing
-open BCMMacros
+open MacroGenerator
 
 
 type file_name = string
