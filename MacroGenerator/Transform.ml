@@ -30,6 +30,14 @@ let macro_transform env macro =
 in run_macro_transformer macro
 
 
+let generate_interface_implementations env interfaces cstruct =
+  List.map (fun interface -> match MacroEnv.get_derive_macro env interface with
+    | Some derive_macro -> derive_macro cstruct |> String.concat "\n"
+    | None -> failwith "Interface not found"
+  ) interfaces
+  |> String.concat "\n"
+
+
 let transform_file include_paths env cfile = 
   let[@tail_mod_cons] rec aux_transform_file env = function
     | Cast.CPreprocesor proc :: rest ->
@@ -50,6 +58,11 @@ let transform_file include_paths env cfile =
       let tokens = macro_transform env use
         |> Print.string_of_macro_tokens
       in tokens ^ aux_transform_file env rest
+    
+    | Derive (interfaces, cstruct) :: rest ->
+      generate_interface_implementations env interfaces cstruct
+      ^ Print.string_of_struct cstruct
+      ^ aux_transform_file env rest
 
     | [] -> "\n"
   in aux_transform_file env cfile

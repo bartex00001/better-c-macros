@@ -15,10 +15,6 @@ val empty : macro_env
 val add_decl_macro 
   : macro_env -> string -> macro_def -> macro_env
 
-(** Adds a macro definition to the environment **)
-val add_derive_macro
-  : macro_env -> string -> unit -> macro_env
-
 (** Attempt to load macro definitions from given shared object file **)
 val add_entries_from_file
   : include_path list -> macro_env -> string -> macro_env
@@ -32,4 +28,4 @@ val get_decl_macro
 (** Get derive macro from the environment.
   * Empty when no macro transformer with given name exists. **)
 val get_derive_macro
-  : macro_env -> string -> unit option
+  : macro_env -> string -> derive_generator option

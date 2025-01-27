@@ -34,6 +34,7 @@ read = parse
 
   | "#bcm_use" { BCM_USE }
   | "##macro" { MACRO_DEF }
+  | "#derive" { DERIVE }
 
   (* Consume and discard comments *)
   | "/*" { read_multiline_comment lexbuf; read lexbuf }
@@ -49,6 +50,11 @@ read = parse
     }
   
   | "'" { CCHAR (read_c_char lexbuf) }
+
+  | "struct" { STRUCT }
+  | "union" { UNION }
+  | "enum" { ENUM }
+  | "typedef" { TYPEDEF }
 
   | identifier { IDENTIFIER (Lexing.lexeme lexbuf) }
 
