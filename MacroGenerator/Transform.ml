@@ -60,8 +60,8 @@ let transform_file include_paths env cfile =
       in tokens ^ aux_transform_file env rest
     
     | Derive (interfaces, cstruct) :: rest ->
-      generate_interface_implementations env interfaces cstruct
-      ^ Print.string_of_struct cstruct
+      Print.string_of_struct cstruct
+      ^ generate_interface_implementations env interfaces cstruct
       ^ aux_transform_file env rest
 
     | [] -> "\n"

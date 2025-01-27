@@ -74,6 +74,7 @@ read = parse
   | "!" { NOT }
 
   | "=" { ASSIGN }
+  | "->" { ARROW }
  
   | "<<=" { SH_LEFT_ASSIGN }
   | "<<" { SH_LEFT }

@@ -13,7 +13,15 @@ let minimal_struct = (
 let basic_fields = (
     { name = "basic"
     ; fields = [
-      Basic CInt, "a"; Basic CULLong, "u_l_l"; Tdef "uint64_t", "u64"
+      { name = "a"
+      ; ctype = Basic CInt
+      ; attributes = []};
+      { name = "u_l_l"
+      ; ctype = Basic CULLong
+      ; attributes = []};
+      { name = "u64"
+      ; ctype = Tdef "uint64_t"
+      ; attributes = []}
     ]
     ; typedef = None
     },
@@ -23,7 +31,15 @@ let basic_fields = (
 let pointers = (
     { name = "pointers"
     ; fields = [
-      Pointer (Basic CInt), "a"; Pointer (Pointer (Basic CULLong)), "u_l_l"; Pointer (Tdef "uint64_t"), "u64"
+      { name = "a"
+      ; ctype = Pointer (Basic CInt)
+      ; attributes = []};
+      { name = "u_l_l"
+      ; ctype = Pointer (Pointer (Basic CULLong))
+      ; attributes = []};
+      { name = "u64"
+      ; ctype = Pointer (Tdef "uint64_t")
+      ; attributes = []}
     ]
     ; typedef = None
     },
@@ -33,7 +49,15 @@ let pointers = (
 let arrays = (
     { name = "arrays"
     ; fields = [
-      Array (Basic CInt, [5]), "a"; Array (Pointer (Basic CULLong), [5; 5]), "u_l_l"; Array (Tdef "uint64_t", [5]), "u64"]
+      { name = "a"
+      ; ctype = Array (Basic CInt, [5])
+      ; attributes = []};
+      { name = "u_l_l"
+      ; ctype = Array (Pointer (Basic CULLong), [5; 5])
+      ; attributes = []};
+      { name = "u64"
+      ; ctype = Array (Tdef "uint64_t", [5])
+      ; attributes = []}]
     ; typedef = None
     },
     "struct arrays { int a[5]; unsigned long long* u_l_l[5][5]; uint64_t u64[5];  }"
@@ -43,8 +67,12 @@ let arrays = (
 let functions = (
     { name = "functions"
     ; fields = [
-      Function (Basic CInt, [Basic CInt; Basic CInt]), "a";
-      Function (Pointer (Tdef "uint64_t"), []), "u64"
+      { name = "a"
+      ; ctype = Function (Basic CInt, [Basic CInt; Basic CInt])
+      ; attributes = []};
+      { name = "u64"
+      ; ctype = Function (Pointer (Tdef "uint64_t"), [])
+      ; attributes = []}
     ]
     ; typedef = None
     },
@@ -54,8 +82,12 @@ let functions = (
 let cstruct = (
     { name = "s"
     ; fields = [
-      Struct (Some "a", []), "s";
-      Struct (None, [Basic CInt, "num"; Basic CBool, "b"]), "s2";
+      { name = "s"
+      ; ctype = Struct (Some "a", [])
+      ; attributes = []};
+      { name = "s2"
+      ; ctype = Struct (None, [Basic CInt, "num"; Basic CBool, "b"])
+      ; attributes = []};
     ]
     ; typedef = Some "s_t"
     },
@@ -65,8 +97,12 @@ let cstruct = (
 let union = (
     { name = "u"
     ; fields = [
-      Union (Some "a", []), "u";
-      Union (None, [Basic CInt, "num"; Basic CBool, "b"]), "u2";
+      { name = "u"
+      ; ctype = Union (Some "a", [])
+      ; attributes = []};
+      { name = "u2"
+      ; ctype = Union (None, [Basic CInt, "num"; Basic CBool, "b"])
+      ; attributes = []};
     ]
     ; typedef = Some "u_t"
     },
@@ -76,8 +112,12 @@ let union = (
 let enum = (
     { name = "e"
     ; fields = [
-      Enum (Some "a", ["A"; "B"; "C"]), "e";
-      Enum (None, ["A"; "B"; "C"]), "e2";
+      { name = "e"
+      ; ctype = Enum (Some "a", ["A"; "B"; "C"])
+      ; attributes = []};
+      { name = "e2"
+      ; ctype = Enum (None, ["A"; "B"; "C"])
+      ; attributes = []};
     ]
     ; typedef = Some "e_t"
     },

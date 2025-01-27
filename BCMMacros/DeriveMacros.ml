@@ -28,10 +28,17 @@ type ctype =
   | Union of ident option * (ctype * ident) list
   | Enum of ident option * ident list
 
+
+type field =
+  { name : ident
+  ; ctype : ctype
+  ; attributes : (ident * macro_token option) list
+  }
+
 type cstruct =
   { name : ident
   (* TODO: Add support for anonymous structs and unions *)
-  ; fields : (ctype * ident) list
+  ; fields : field list
   ; typedef: ident option
   }
 
