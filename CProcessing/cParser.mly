@@ -4,9 +4,8 @@ open BCMMacros
 
 (* During lexing not all C symbols will be "close" to each other
  * thus they will be parsed as separate entries.
- * This is unnecesary thus we can just 'squash' them together.
- * `[@tail_mod_cons]` makes this function 'tail-recursive' *)
-let[@tail_mod_cons] rec squash_code = function
+ * This is unnecesary thus we can just 'squash' them together. *)
+let rec squash_code = function
   | CCode s1 :: CCode s2 :: tl -> squash_code (CCode (s1 ^ " " ^ s2) :: tl)
   | x :: li -> x :: squash_code li
   | [] -> []
@@ -98,6 +97,7 @@ let get_type_of_list = function
 %token NOT
 
 %token ASSIGN
+%token ARROW
 
 %token SH_LEFT_ASSIGN
 %token SH_LEFT
@@ -260,17 +260,40 @@ use_macro_token_segment:
 
 // ------------------------ CStruct parsing
 parse_cstruct:
-  | TYPEDEF; STRUCT; name = IDENTIFIER; LBRACE; fields = parse_cstruct_fields*; RBRACE; tdef = IDENTIFIER
+  | TYPEDEF; STRUCT; name = IDENTIFIER; LBRACE; fields = parse_cstruct_field_with_attributes*; RBRACE; tdef = IDENTIFIER
     { {name; fields; typedef = Some tdef} }
-  | STRUCT; name = IDENTIFIER; LBRACE; fields = parse_cstruct_fields*; RBRACE
+  | STRUCT; name = IDENTIFIER; LBRACE; fields = parse_cstruct_field_with_attributes*; RBRACE
     { {name; fields; typedef = None} }
   ;
 
-parse_cstruct_fields:
-  | parse_simple_value; SEMICOLON { $1 }
-  | parse_pointer_value; SEMICOLON { $1 }
-  | parse_array_value; SEMICOLON { $1 }
-  | parse_function_value; SEMICOLON { $1 }
+parse_cstruct_field_with_attributes:
+  | parse_attributes; parse_cstruct_field; SEMICOLON {
+      let (ctype, name) = $2
+      in { ctype; name; attributes = $1 } }
+  | parse_cstruct_field; SEMICOLON {
+      let (ctype, name) = $1
+      in { ctype; name; attributes = [] } }
+  ;
+
+parse_cstruct_field:
+  | parse_simple_value { $1 }
+  | parse_pointer_value { $1 }
+  | parse_array_value { $1 }
+  | parse_function_value { $1 }
+  ;
+
+parse_attributes:
+  | HASH; LBRACKET; RBRACKET { [] }
+  | HASH; LBRACKET; attr = attributes; RBRACKET { attr }
+  ;
+
+attributes:
+  | IDENTIFIER { [$1, None] }
+  | IDENTIFIER; LPAREN; token = macro_typed_token; RPAREN
+    { [$1, Some token] }
+  | IDENTIFIER; COMMA; rest = attributes { ($1, None) :: rest }
+  | IDENTIFIER; LPAREN; token = macro_typed_token; RPAREN; COMMA; rest = attributes
+    { ($1, Some token) :: rest }
   ;
 
 parse_simple_value:
@@ -343,6 +366,10 @@ code_element:
 
 
 token_as_string:
+  | STRUCT { "struct" }
+  | UNION { "union" }
+  | ENUM { "enum" }
+  | TYPEDEF { "typedef" }
   | EQ { "==" }
   | PLUS_ASSIGN { "+=" }
   | MINUS_ASSIGN { "-=" }
@@ -355,6 +382,7 @@ token_as_string:
   | NOT_EQ { "!=" }
   | NOT { "!" }
   | ASSIGN { "=" }
+  | ARROW { "->" }
   | SH_LEFT_ASSIGN { "<<=" }
   | SH_LEFT { "<<" }
   | LE { "<=" }
