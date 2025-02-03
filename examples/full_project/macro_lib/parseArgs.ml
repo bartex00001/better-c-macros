@@ -9,7 +9,6 @@ type arg =
 }
 
 
-
 let print_usage fields =
   "printf(\"Usage: %s [options]\\n\", argv0);\n"
   ^ "printf(\"Options:\\n\");\n"
@@ -90,7 +89,6 @@ let create_case {name; arg_type; short; _} =
   | CBool -> "true;\nbreak;"
   | _ -> failwith "Unsupported argument type"
   in case ^ assign ^ value
-
 
 
 let create_parser name args =
