@@ -10,6 +10,10 @@
  * - short(Char) – short option name (required)
  * - long(String) – long option name (TODO!)
  * - desc(String) – description of the option
+ * 
+ * Required Includes:
+ * - `stdbool.h`
+ * - `stdlib.h`
 */
 
 #define impl_parseArgs(name) \
