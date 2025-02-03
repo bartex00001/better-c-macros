@@ -11,9 +11,13 @@ let start_env =
 
 
 let process_file include_paths filename =
-  (* TODO: Add error handling for parser *)
   (* TODO: Make sure the file exists *)
-  Eval.parse_file_c filename
+  begin try Eval.parse_file_c filename with
+  | Eval.ParseException (file_name, line, char_start, char_end, token) ->
+    Printf.printf "Error parsing file %s at line %d, characters %d-%d: %s\n"
+      file_name line char_start char_end token;
+    exit 1
+  end
   |> Transform.transform_file include_paths start_env
 
 

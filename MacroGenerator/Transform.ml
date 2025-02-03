@@ -1,6 +1,7 @@
 open CProcessing
 open BCMMacros
 
+
 (** Transform macro use into a list of tokens.
 * This function will also handle recursive macro expansion **)
 let macro_transform env macro =
@@ -27,7 +28,8 @@ let macro_transform env macro =
     transform (name, tokens)
     |> tokens_of_result_tokens
 
-in run_macro_transformer macro
+  in
+  run_macro_transformer macro
 
 
 let generate_interface_implementations env interfaces cstruct =
@@ -65,4 +67,5 @@ let transform_file include_paths env cfile =
       ^ aux_transform_file env rest
 
     | [] -> "\n"
-  in aux_transform_file env cfile
+  in
+  aux_transform_file env cfile

@@ -41,8 +41,7 @@ let add_entries_from_file include_paths env lib_name =
     | Some lib_path ->
       clear_values ();
       (* TODO: Add error handling for dynlink *)
-      let _ = Dynlink.loadfile lib_path
-      in
+      let _ = Dynlink.loadfile lib_path in
       let decl_macros = get_decl_macros ()
       and derive_macros = get_derive_macros ()
       in

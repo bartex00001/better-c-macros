@@ -1,7 +1,7 @@
 (lang dune 3.15)
 
 (name bcm)
-(version 0.0.2)
+(version 0.1.0)
 
 (generate_opam_files true)
 
@@ -19,7 +19,7 @@
 (package
  (name bcm)
  (synopsis "Better macros for C")
- (description "A longer description")
+ (description "Rust-like macros for C. Compatible with C ABI.")
  (depends ocaml dune Alcotest unix test_bcm))
 
 (using menhir 3.0)

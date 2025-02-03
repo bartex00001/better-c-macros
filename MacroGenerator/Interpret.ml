@@ -49,7 +49,8 @@ let run_state_machine sm token_list =
       | Single t -> Single t
       | List l -> List (List.rev l)
     end env
-    in {position; env = new_env; buffer}
+    in
+    {position; env = new_env; buffer}
   in
 
   let rec run sm_state token_list =
@@ -85,23 +86,21 @@ type transition_helper =
 
 (** Adds changes saved in sm buffer to environment **)
 let apply_buffer =
-  List.fold_left (fun env ->function
-    | t, Some name -> StrMap.update name
-    begin function
-      | Some (List li) -> Some (List (t :: li))
-      | None -> Some (List [t])
-      (* TODO: replace with an exceptuion *)
-      | _ -> failwith "Invalid state machine!"
-    end env
-    | _, None -> env )
+  List.fold_left (fun env -> function
+    | t, Some name -> StrMap.update name begin function
+        | Some (List li) -> Some (List (t :: li))
+        | None -> Some (List [t])
+        (* TODO: replace with an exceptuion *)
+        | _ -> failwith "Invalid state machine!"
+      end env
+    | _, None -> env)
 
 let state_transition_of_transition_helper_direct = function
-  | Goto next_state -> fun (sm_state, _, token_list) ->
-    SMGoto (
-      {position = next_state
-      ; env = sm_state.env
-      ; buffer = sm_state.buffer
-      }, token_list)
+  | Goto next_state -> fun (sm_state, _, token_list) -> SMGoto (
+    {position = next_state
+    ; env = sm_state.env
+    ; buffer = sm_state.buffer
+    }, token_list)
   
   | SequenceNext next_state -> fun (sm_state, t, token_list) -> SMGoto (
     { position = next_state
@@ -199,7 +198,7 @@ let get_basic_match_transition (next : transition_helper) (fail : transition_hel
 
 
 (** State transitions for given sequence starting with 'start_id'.
-  * Altered state machine will be returned alongside last `sm_state` used. **)
+Altered state machine will be returned alongside last `sm_state` used. **)
 let add_sequence_match_transition sm start_state after_sequence mme_list (* TODO: type annotate and reduce *) =
   let fail = SequenceFail after_sequence
   and start = SequenceConfirm start_state
@@ -211,10 +210,11 @@ let add_sequence_match_transition sm start_state after_sequence mme_list (* TODO
       in
       StateMachine.add curr_state transition sm
     | mme :: tl ->
-      let next_state = curr_state + 1
-      in let transition = get_basic_match_transition (SequenceNext next_state) fail mme 
-      in let sm = StateMachine.add curr_state transition sm
-      in get_transition sm next_state tl
+      let next_state = curr_state + 1 in
+      let transition = get_basic_match_transition (SequenceNext next_state) fail mme in
+      let sm = StateMachine.add curr_state transition sm
+      in
+      get_transition sm next_state tl
   in
   get_transition sm start_state mme_list
 
@@ -230,16 +230,16 @@ let sm_of_macro_matcher_list mm_li =
       in
       StateMachine.add curr_state transition sm
     | BasicMatch mme :: tl ->
-      let next_state = curr_state + 1
-      in let next = Goto next_state
-      in let transition = get_basic_match_transition next Fail mme
-      in let sm = StateMachine.add curr_state transition sm
+      let next_state = curr_state + 1 in
+      let next = Goto next_state in
+      let transition = get_basic_match_transition next Fail mme in
+      let sm = StateMachine.add curr_state transition sm
       in
       acc_transitions sm next_state tl
 
     | SequenceMatch mme_list :: tl ->
-      let after_sequence = curr_state + (List.length mme_list)
-      in let transition = add_sequence_match_transition sm curr_state after_sequence mme_list
+      let after_sequence = curr_state + (List.length mme_list) in
+      let transition = add_sequence_match_transition sm curr_state after_sequence mme_list
       in
       acc_transitions transition after_sequence tl
   in
@@ -247,7 +247,7 @@ let sm_of_macro_matcher_list mm_li =
 
 
 (** Finds first element of the list for which application to `f` returns `Some _`.
-  * If no such no such element exists in a list `None` will be returned. **)
+If no such no such element exists in a list `None` will be returned. **)
 let rec find_first f = function
 (* Option-monad :D *)
   | [] -> None
@@ -257,21 +257,21 @@ let rec find_first f = function
     end
 
 
-
 let rec expand env = function
-| [] -> []
-| DirectRes t :: mre_l -> Tok t :: expand env mre_l
-| NamedRes name :: mre_l ->
-  let token = begin match StrMap.find_opt name env with
-    | Some (List (l :: _)) -> l
-    (* TODO: Make this into an exception... *)
-    | Some (List []) -> failwith "Empty list cannot be expanded!"
-    | Some (Single t) -> t
-    | None -> failwith "No such variable in environment!"
-  end in 
+  | [] -> []
+  | DirectRes t :: mre_l -> Tok t :: expand env mre_l
+  | NamedRes name :: mre_l ->
+    let token = begin match StrMap.find_opt name env with
+      | Some (List (l :: _)) -> l
+      (* TODO: Make this into an exception... *)
+      | Some (List []) -> failwith "Empty list cannot be expanded!"
+      | Some (Single t) -> t
+      | None -> failwith "No such variable in environment!"
+    end
+    in 
     Tok token :: expand env mre_l
-| MacroResUse (name, mre_list) :: mre_l ->
-  Use (name, expand env mre_list) :: expand env mre_l
+  | MacroResUse (name, mre_list) :: mre_l ->
+    Use (name, expand env mre_list) :: expand env mre_l
 
 
 (** Expands sequence of macro_result_element *)
@@ -305,9 +305,8 @@ let expandSequence env mre_list =
     | Some count ->
       let rec expand_n env = function
         | 0 -> []
-        | n ->
-            let new_env = shorten_env env in
-            expand env mre_list @ expand_n new_env (n - 1)
+        | n -> let new_env = shorten_env env in
+          expand env mre_list @ expand_n new_env (n - 1)
       in
       expand_n env count
 
@@ -332,13 +331,12 @@ let[@tail_mod_cons] rec print_result_tokens env = function
 
 
 let token_transformer_of_macro_def macro_def =
-  let matches = macro_def.matches
-  in let state_machines = List.map
-    (fun {matcher; result} -> (sm_of_macro_matcher_list matcher, result)) matches
+  let matches = macro_def.matches in
+  let state_machines = List.map (fun {matcher; result} ->
+    (sm_of_macro_matcher_list matcher, result)) matches
   in
   fun macro_tokens ->
-    let macro_tokens = macro_tokens @ [EndToken]
-    in
+    let macro_tokens = macro_tokens @ [EndToken] in
     let result = find_first (fun (sm, res) ->
       match run_state_machine sm macro_tokens with
         | Some st_state -> Some (st_state, res)
