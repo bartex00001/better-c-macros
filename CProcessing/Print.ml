@@ -43,7 +43,8 @@ let rec print_c_type = function
   | Pointer ct -> print_c_type ct ^ "*"
 
   | Array (ct, dims) ->
-    let dims_str = List.map (fun i -> "[" ^ string_of_int i ^ "]") dims |> String.concat "" in
+    let dims_str = List.map (fun i -> "[" ^ string_of_int i ^ "]") dims |> String.concat ""
+    in
     print_c_type ct ^ dims_str
 
   | Function (ret, args) -> 
@@ -85,9 +86,9 @@ and print_fields = function
 
 
 let string_of_struct cstruct =
-  let name = cstruct.name
-  in let fields = cstruct.fields |> List.map (fun {name; ctype; _} -> (ctype, name))
-  in let (td_pref, td_suf) = match cstruct.typedef with
+  let name = cstruct.name in
+  let fields = cstruct.fields |> List.map (fun {name; ctype; _} -> (ctype, name)) in
+  let (td_pref, td_suf) = match cstruct.typedef with
     | Some id -> "typedef ", " " ^ id
     | None -> "", ""
   in

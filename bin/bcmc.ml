@@ -12,11 +12,11 @@ let process_single_file include_paths verbose file_name =
 
 
 let () =
-  let config = ParseBCMC.parse ()
-  in let include_paths = config.include_paths
+  let config = ParseBCMC.parse () in
+  let include_paths = config.include_paths
   in
   let _ = List.fold_left (fun _ file_name ->
     process_single_file include_paths config.verbose file_name)
     () config.files; flush_all ();
   in
-  Unix.execvp config.cmd config.args;
+  Unix.execvp config.cmd config.args
