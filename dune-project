@@ -13,7 +13,7 @@
 
 (maintainers "Bartlomiej Stefanski")
 
-(license LICENSE)
+(license MIT)
 
 (package
  (name bcm)
