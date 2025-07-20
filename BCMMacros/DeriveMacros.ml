@@ -28,7 +28,6 @@ type ctype =
   | Union of ident option * (ctype * ident) list
   | Enum of ident option * ident list
 
-
 type field =
   { name : ident
   ; ctype : ctype
@@ -36,15 +35,12 @@ type field =
   }
 
 type cstruct =
-  { name : ident
-  (* TODO: Add support for anonymous structs and unions *)
+  { name : ident (* TODO: Add support for anonymous structs and unions *)
   ; fields : field list
-  ; typedef: ident option
+  ; typedef : ident option
   }
 
-
-(** Define function definitions as strings. Why?  
-  * It's convenient. *)
+(** Define function definitions as strings. Why? * It's convenient. *)
 type function_definition = string
 
 type derive_generator = cstruct -> function_definition list
