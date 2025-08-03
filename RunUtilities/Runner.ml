@@ -23,7 +23,15 @@ let process_file include_paths filename =
   |> Transform.transform_file include_paths start_env
 ;;
 
+let rec mkdir_p path =
+  let parent = Filename.dirname path in
+  if not (Sys.file_exists parent) then mkdir_p parent;
+  if not (Sys.file_exists path) then Unix.mkdir path 0o755
+;;
+
 let print_to_file file_name contents =
+  let path = Filename.dirname file_name in
+  if not (Sys.file_exists path) then mkdir_p path;
   let oc = open_out file_name in
   Printf.fprintf oc "%s" contents
 ;;
