@@ -94,5 +94,10 @@ let parse_compiler_arguments compiler_cmd =
 let parse () =
   let verbose, include_paths, build_dir, compiler_cmd = parse_arguments () in
   let sources, (cmd, args) = parse_compiler_arguments compiler_cmd in
-  { sources; include_paths; build_dir; verbose; cmd; args = Array.of_list (cmd :: args) }
+  let args = List.map (fun x -> "-I" ^ x) include_paths @ args in
+  let args = Array.of_list (cmd :: args) in
+  let include_paths =
+    List.map (Filename.concat build_dir) include_paths @ include_paths
+  in
+  { sources; include_paths; build_dir; verbose; cmd; args }
 ;;
