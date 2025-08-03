@@ -1,12 +1,17 @@
 type file_name = string
 
+type source_file =
+  { source : file_name
+  ; result : file_name
+  }
+
 type configuration =
-  { files : file_name list
+  { sources : source_file list
   ; include_paths : file_name list
+  ; build_dir : string
   ; verbose : bool
   ; cmd : file_name
   ; args : string array
   }
 
-val get_file_name : file_name -> file_name
 val parse : unit -> configuration
